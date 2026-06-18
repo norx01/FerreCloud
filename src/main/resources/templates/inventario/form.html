@@ -26,9 +26,21 @@
                     <label>Nombre del Producto</label>
                     <input type="text" th:field="*{nombre}" placeholder="Ej: Martillo Truper" required>
                 </div>
+
                 <div class="field">
                     <label>Categoría</label>
-                    <input type="text" th:field="*{categoria}" placeholder="Ej: Herramientas Manuales" required>
+                    <select id="categoriaSelect" onchange="manejarCategoria()">
+                        <option value="Herramientas Manuales">Herramientas Manuales</option>
+                        <option value="Herramientas Eléctricas">Herramientas Eléctricas</option>
+                        <option value="Materiales de Construcción">Materiales de Construcción</option>
+                        <option value="Pinturas y Accesorios">Pinturas y Accesorios</option>
+                        <option value="Plomería">Plomería</option>
+                        <option value="Electricidad">Electricidad</option>
+                        <option value="Tornillería">Tornillería</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Otro">Otro (Escribir nueva)...</option>
+                    </select>
+                    <input type="text" th:field="*{categoria}" placeholder="Escribe la categoría" style="display: none; margin-top: 0.5rem;">
                 </div>
             </div>
 
@@ -46,8 +58,14 @@
             <div class="field-row">
                 <div class="field">
                     <label>Proveedor</label>
-                    <input type="text" th:field="*{proveedor}" placeholder="Nombre de la empresa distribuidora" required>
+                    <select th:field="*{proveedor}" required>
+                        <option value="" disabled selected>Seleccione un proveedor...</option>
+                        <option th:each="prov : ${proveedores}"
+                                th:value="${prov.nombre}"
+                                th:text="${prov.nombre}"></option>
+                    </select>
                 </div>
+
                 <div class="field">
                     <label>Stock Mínimo (Alerta)</label>
                     <input type="number" th:field="*{stockMinimo}" placeholder="0" required>
@@ -63,6 +81,47 @@
 
 <th:block layout:fragment="scripts">
     <script th:src="@{/js/form.js}" defer></script>
+
+    <script>
+        function manejarCategoria() {
+            const select = document.getElementById('categoriaSelect');
+            const inputReal = document.getElementById('categoria');
+
+            if (select.value === 'Otro') {
+                inputReal.style.display = 'block';
+                inputReal.value = '';
+                inputReal.focus();
+                inputReal.required = true;
+            } else {
+                inputReal.style.display = 'none';
+                inputReal.value = select.value;
+                inputReal.required = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const select = document.getElementById('categoriaSelect');
+            const inputReal = document.getElementById('categoria');
+
+            if (inputReal.value) {
+                let existeEnLista = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === inputReal.value) {
+                        existeEnLista = true;
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                if (!existeEnLista) {
+                    select.value = 'Otro';
+                    inputReal.style.display = 'block';
+                }
+            } else {
+                inputReal.value = select.value;
+            }
+        });
+    </script>
 </th:block>
 
 </body>
