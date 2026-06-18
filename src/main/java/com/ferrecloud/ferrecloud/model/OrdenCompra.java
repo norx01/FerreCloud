@@ -1,5 +1,6 @@
 package com.ferrecloud.ferrecloud.model;
 
+import com.ferrecloud.ferrecloud.enums.EstadoOrden;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

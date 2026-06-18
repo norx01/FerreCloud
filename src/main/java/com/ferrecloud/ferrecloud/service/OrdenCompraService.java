@@ -3,7 +3,7 @@ package com.ferrecloud.ferrecloud.service;
 import com.ferrecloud.ferrecloud.dto.ItemOrdenDTO;
 import com.ferrecloud.ferrecloud.dto.OrdenCompraDTO;
 import com.ferrecloud.ferrecloud.model.Clientes;
-import com.ferrecloud.ferrecloud.model.EstadoOrden;
+import com.ferrecloud.ferrecloud.enums.EstadoOrden;
 import com.ferrecloud.ferrecloud.model.ItemOrden;
 import com.ferrecloud.ferrecloud.model.OrdenCompra;
 import com.ferrecloud.ferrecloud.repository.ClientesRepository;

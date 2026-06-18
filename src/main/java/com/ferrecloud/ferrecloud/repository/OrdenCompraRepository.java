@@ -1,6 +1,6 @@
 package com.ferrecloud.ferrecloud.repository;
 
-import com.ferrecloud.ferrecloud.model.EstadoOrden;
+import com.ferrecloud.ferrecloud.enums.EstadoOrden;
 import com.ferrecloud.ferrecloud.model.OrdenCompra;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
