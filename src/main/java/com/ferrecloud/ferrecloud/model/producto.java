@@ -13,7 +13,8 @@ public class producto {
     private String nombre;
     private String categoria;
     private Double precio;
-    private Integer stock;
     private String proveedor;
-    private Integer stockMinimo;
+    private int Stock;
+    private int StockMinimo;
+
 }
