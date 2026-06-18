@@ -27,6 +27,9 @@ public class ProveedoresService
         return repository.save(proveedores);
     }
 
+    public Proveedores buscarPorId(String id) {
+        return repository.findById(id).orElse(null);
+    }
 
     public void eliminar(String id) {
         Proveedores proveedor = repository.findById(id).orElse(null);
