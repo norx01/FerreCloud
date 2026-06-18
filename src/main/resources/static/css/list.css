@@ -157,4 +157,14 @@ tbody td {
     color: #9ca3af;
     font-size: 0.88rem;
     padding: 2.5rem;
+
+.id-cell {
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    color: #9ca3af;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 }

@@ -21,6 +21,9 @@ public class ClientesService {
     }
 
     public Clientes guardar(Clientes cliente) {
+        if (cliente.getId() != null && cliente.getId().isBlank()) {
+            cliente.setId(null);
+        }
         return repository.save(cliente);
     }
 
