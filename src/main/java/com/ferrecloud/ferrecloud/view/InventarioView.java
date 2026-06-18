@@ -18,27 +18,30 @@ public class InventarioView {
 
     @GetMapping
     public String listar(Model model) {
-        // Pasamos la lista de productos a la vista con el nombre "productos"
         model.addAttribute("productos", service.listar());
         return "inventario/list";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
-        // Pasamos un objeto vacío a la vista para el formulario
         model.addAttribute("producto", new producto());
         return "inventario/form";
     }
 
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute producto producto) {
+        // --- LA SOLUCIÓN ESTÁ AQUÍ ---
+        // Si el ID es un texto vacío (""), lo volvemos null para que MongoDB cree uno nuevo.
+        if (producto.getId() != null && producto.getId().isEmpty()) {
+            producto.setId(null);
+        }
+
         service.guardar(producto);
         return "redirect:/inventario";
     }
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable String id, Model model) {
-        // Buscamos el producto por ID y lo pasamos al formulario para editarlo
         model.addAttribute("producto", service.buscarPorId(id));
         return "inventario/form";
     }
@@ -52,7 +55,6 @@ public class InventarioView {
     @GetMapping("/alertas")
     public String alertasStock(Model model) {
         model.addAttribute("productos", service.obtenerProductosConStockBajo());
-        // Esto retornaría a una vista HTML dedicada a alertas, puedes crearla luego
         return "inventario/alertas";
     }
 }
