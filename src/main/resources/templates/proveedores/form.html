@@ -14,45 +14,39 @@
     <div class="card">
         <div class="card-header">
             <div class="eyebrow">FerreCloud</div>
-            <h1>Nuevo Cliente</h1>
-            <p>Completa los datos para registrar el cliente.</p>
+            <h1>Gestión de Proveedor</h1>
+            <p>Completa los datos para registrar o editar el proveedor.</p>
         </div>
         <div class="divider"></div>
 
-        <form th:action="@{/clientes/guardar}" th:object="${cliente}" method="post">
+        <form th:action="@{/proveedores/guardar}" th:object="${proveedor}" method="post">
             <input type="hidden" th:field="*{id}">
 
             <div class="field-row">
                 <div class="field">
-                    <label>Nombre</label>
-                    <input type="text" th:field="*{nombre}" placeholder="Juan García">
+                    <label>Nombre del Proveedor</label>
+                    <input type="text" th:field="*{nombre}" placeholder="Ej. Distribuidora Nacional">
                 </div>
-                <div class="field">
-                    <label>Documento</label>
-                    <input type="text" th:field="*{documento}" placeholder="1234567890">
-                </div>
-            </div>
-
-            <div class="field-row">
                 <div class="field">
                     <label>Teléfono</label>
                     <input type="text" th:field="*{telefono}" placeholder="300 000 0000">
-                </div>
-                <div class="field">
-                    <label>Correo Electrónico</label>
-                    <input type="email" th:field="*{correoElectronico}" placeholder="correo@ejemplo.com">
                 </div>
             </div>
 
             <div class="field">
                 <label>Dirección</label>
-                <input type="text" th:field="*{direccion}" placeholder="Calle 10 # 5-30, Cali">
+                <input type="text" th:field="*{direccion}" placeholder="Ej. Carrera 40 # 10-20">
             </div>
 
-            <button type="submit" class="btn-submit">Guardar Cliente</button>
+            <div class="field">
+                <label>Productos Suministrados</label>
+                <input type="text" th:field="*{productosSuministrados}" placeholder="Ej. Herramientas, Cemento, Tubería">
+            </div>
+
+            <button type="submit" class="btn-submit">Guardar Proveedor</button>
         </form>
 
-        <a href="/clientes" class="back-link">← Volver al listado</a>
+        <a href="/proveedores" class="back-link">← Volver al listado</a>
     </div>
 
 </div>

@@ -19,7 +19,6 @@ public class InventarioService {
         return repository.findAll();
     }
 
-
     public producto buscarPorId(String id) {
         return repository.findById(id).orElse(null);
     }
@@ -32,4 +31,8 @@ public class InventarioService {
         repository.deleteById(id);
     }
 
+
+    public List<producto> obtenerProductosConStockBajo() {
+        return repository.findByStockBajo();
+    }
 }

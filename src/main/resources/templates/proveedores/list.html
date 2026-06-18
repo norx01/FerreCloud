@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/list.css}">
+        <style>
+            .alert-error {
+                background-color: #ffe6e6; /* Rosado pastel suave */
+                color: #d32f2f;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                border: 1px solid #ffb3b3;
+                text-align: center;
+                font-weight: 500;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+    <div th:if="${param.error != null and param.error[0] == 'restriccion'}" class="alert-error">
+        <strong>¡Atención!</strong> No se puede eliminar este proveedor porque tiene productos activos con stock en el sistema.
+    </div>
+
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">FerreCloud</div>
+            <h1>Proveedores</h1>
+            <p>Gestión de proveedores registrados</p>
+        </div>
+        <a th:href="@{/proveedores/nuevo}" class="btn-nuevo">+ Nuevo Proveedor</a>
+    </div>
+
+    <div class="buscador-wrapper">
+        <input type="text" id="buscador" placeholder="Buscar proveedor por nombre, teléfono, productos...">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Productos Suministrados</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="proveedor : ${proveedores}">
+                <td class="id-cell" th:text="${proveedor.id}"></td>
+                <td th:text="${proveedor.nombre}"></td>
+                <td th:text="${proveedor.telefono}"></td>
+                <td th:text="${proveedor.direccion}"></td>
+                <td th:text="${proveedor.productosSuministrados}"></td>
+                <td class="acciones">
+                    <a th:href="@{/proveedores/editar/{id}(id=${proveedor.id})}" class="btn-editar">Editar</a>
+                    <a th:href="@{/proveedores/eliminar/{id}(id=${proveedor.id})}" class="btn-eliminar">Eliminar</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(proveedores)}" class="empty-row">
+                <td colspan="6" class="empty">No hay proveedores registrados aún.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/list.js}" defer></script>
+</th:block>
+
+</body>
+</html>

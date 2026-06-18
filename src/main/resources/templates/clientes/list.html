@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
 <head>
-    <title>Clientes</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/list.css}">
-    <script th:src="@{/js/list.js}" defer></script>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/list.css}">
+    </th:block>
 </head>
 <body>
 
-<div class="container">
+<div layout:fragment="contenido">
+
     <div class="page-header">
         <div>
             <div class="eyebrow">FerreCloud</div>
@@ -26,6 +28,7 @@
         <table>
             <thead>
             <tr>
+                <th>ID</th>
                 <th>Nombre</th>
                 <th>Documento</th>
                 <th>Teléfono</th>
@@ -36,6 +39,7 @@
             </thead>
             <tbody>
             <tr th:each="cliente : ${clientes}">
+                <td class="id-cell" th:text="${cliente.id}"></td>
                 <td th:text="${cliente.nombre}"></td>
                 <td th:text="${cliente.documento}"></td>
                 <td th:text="${cliente.telefono}"></td>
@@ -47,12 +51,17 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(clientes)}" class="empty-row">
-                <td colspan="6" class="empty">No hay clientes registrados aún.</td>
+                <td colspan="7" class="empty">No hay clientes registrados aún.</td>
             </tr>
             </tbody>
         </table>
     </div>
+
 </div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/list.js}" defer></script>
+</th:block>
 
 </body>
 </html>
