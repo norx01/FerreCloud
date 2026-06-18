@@ -6,6 +6,23 @@
     <title>Inventario - FerreCloud</title>
     <th:block layout:fragment="estilos">
         <link rel="stylesheet" th:href="@{/css/list.css}">
+        <style>
+            .alerta-stock {
+                background-color: #fef2f2;
+                border-left: 4px solid #ef4444;
+                color: #991b1b;
+                padding: 12px 16px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .stock-peligro {
+                color: #ef4444;
+                font-weight: 600;
+            }
+        </style>
     </th:block>
 </head>
 <body>
@@ -20,6 +37,13 @@
             <a th:href="@{/inventario/nuevo}" class="btn-nuevo">+ Nuevo Producto</a>
         </div>
 
+        <div th:if="${not #lists.isEmpty(alertas)}" class="alerta-stock">
+            <span>⚠️</span>
+            <div>
+                <strong>¡Atención!</strong> Tienes <span th:text="${#lists.size(alertas)}"></span> producto(s) con el stock igual o por debajo del mínimo permitido. Verifica la tabla.
+            </div>
+        </div>
+
         <div class="buscador-wrapper">
             <input type="text" id="buscador" placeholder="Buscar producto por nombre, categoría, proveedor...">
         </div>
@@ -31,7 +55,7 @@
                     <th>Nombre</th>
                     <th>Categoría</th>
                     <th>Precio</th>
-                    <th>Stock</th>
+                    <th>Stock Actual</th>
                     <th>Proveedor</th>
                     <th>Stock Mín.</th>
                     <th>Acciones</th>
@@ -42,7 +66,12 @@
                     <td th:text="${producto.nombre}"></td>
                     <td th:text="${producto.categoria}"></td>
                     <td th:text="'$ ' + ${producto.precio}"></td>
-                    <td th:text="${producto.stock}"></td>
+
+                    <td th:classappend="${producto.stock <= producto.stockMinimo} ? 'stock-peligro' : ''">
+                        <span th:text="${producto.stock}"></span>
+                        <span th:if="${producto.stock <= producto.stockMinimo}" title="Requiere reabastecimiento">⚠️</span>
+                    </td>
+
                     <td th:text="${producto.proveedor}"></td>
                     <td th:text="${producto.stockMinimo}"></td>
                     <td class="acciones">

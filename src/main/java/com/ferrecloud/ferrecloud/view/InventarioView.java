@@ -18,7 +18,12 @@ public class InventarioView {
 
     @GetMapping
     public String listar(Model model) {
+        // 1. Mandamos TODOS los productos para la tabla
         model.addAttribute("productos", service.listar());
+
+        // 2. Mandamos SOLO los productos con stock bajo para la notificación
+        model.addAttribute("alertas", service.obtenerProductosConStockBajo());
+
         return "inventario/list";
     }
 
@@ -30,8 +35,6 @@ public class InventarioView {
 
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute producto producto) {
-        // --- LA SOLUCIÓN ESTÁ AQUÍ ---
-        // Si el ID es un texto vacío (""), lo volvemos null para que MongoDB cree uno nuevo.
         if (producto.getId() != null && producto.getId().isEmpty()) {
             producto.setId(null);
         }
