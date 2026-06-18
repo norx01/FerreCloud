@@ -2,42 +2,53 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cliente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <script th:src="@{/js/form.js}" defer></script>
 </head>
 <body>
+<div class="card">
+    <div class="card-header">
+        <div class="eyebrow">FerreCloud</div>
+        <h1>Nuevo Cliente</h1>
+        <p>Completa los datos para registrar el cliente.</p>
+    </div>
+    <div class="divider"></div>
 
-<h1>Cliente</h1>
+    <form th:action="@{/clientes/guardar}" th:object="${cliente}" method="post">
+        <input type="hidden" th:field="*{id}">
 
-<form th:action="@{/clientes/guardar}"
-      th:object="${cliente}"
-      method="post">
+        <div class="field-row">
+            <div class="field">
+                <label>Nombre</label>
+                <input type="text" th:field="*{nombre}" placeholder="Juan García">
+            </div>
+            <div class="field">
+                <label>Documento</label>
+                <input type="text" th:field="*{documento}" placeholder="1234567890">
+            </div>
+        </div>
 
-    <input type="hidden" th:field="*{id}">
+        <div class="field-row">
+            <div class="field">
+                <label>Teléfono</label>
+                <input type="text" th:field="*{telefono}" placeholder="300 000 0000">
+            </div>
+            <div class="field">
+                <label>Correo Electrónico</label>
+                <input type="email" th:field="*{correoElectronico}" placeholder="correo@ejemplo.com">
+            </div>
+        </div>
 
-    <label>Nombre</label>
-    <input type="text" th:field="*{nombre}">
-    <br><br>
+        <div class="field">
+            <label>Dirección</label>
+            <input type="text" th:field="*{direccion}" placeholder="Calle 10 # 5-30, Cali">
+        </div>
 
-    <label>Documento</label>
-    <input type="text" th:field="*{documento}">
-    <br><br>
+        <button type="submit" class="btn-submit">Guardar Cliente</button>
+    </form>
 
-    <label>Teléfono</label>
-    <input type="text" th:field="*{telefono}">
-    <br><br>
-
-    <label>Dirección</label>
-    <input type="text" th:field="*{direccion}">
-    <br><br>
-
-    <label>Correo Electrónico</label>
-    <input type="email" th:field="*{correoElectronico}">
-    <br><br>
-
-    <button type="submit">
-        Guardar
-    </button>
-
-</form>
-
+    <a href="/clientes" class="back-link">← Volver al listado</a>
+</div>
 </body>
 </html>

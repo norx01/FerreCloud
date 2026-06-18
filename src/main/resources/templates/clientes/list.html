@@ -2,45 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Clientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/list.css}">
+    <script th:src="@{/js/list.js}" defer></script>
 </head>
 <body>
 
-<h1>Clientes</h1>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">FerreCloud</div>
+            <h1>Clientes</h1>
+            <p>Gestión de clientes registrados</p>
+        </div>
+        <a th:href="@{/clientes/nuevo}" class="btn-nuevo">+ Nuevo Cliente</a>
+    </div>
 
-<a th:href="@{/clientes/nuevo}">
-    Nuevo Cliente
-</a>
+    <div class="buscador-wrapper">
+        <input type="text" id="buscador" placeholder="Buscar cliente por nombre, documento, correo...">
+    </div>
 
-<table border="1">
-
-    <tr>
-        <th>Nombre</th>
-        <th>Documento</th>
-        <th>Teléfono</th>
-        <th>Dirección</th>
-        <th>Correo</th>
-        <th>Acciones</th>
-    </tr>
-
-    <tr th:each="cliente : ${clientes}">
-        <td th:text="${cliente.nombre}"></td>
-        <td th:text="${cliente.documento}"></td>
-        <td th:text="${cliente.telefono}"></td>
-        <td th:text="${cliente.direccion}"></td>
-        <td th:text="${cliente.correoElectronico}"></td>
-
-        <td>
-            <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}">
-                Editar
-            </a>
-
-            <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}">
-                Eliminar
-            </a>
-        </td>
-    </tr>
-
-</table>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Documento</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cliente : ${clientes}">
+                <td th:text="${cliente.nombre}"></td>
+                <td th:text="${cliente.documento}"></td>
+                <td th:text="${cliente.telefono}"></td>
+                <td th:text="${cliente.direccion}"></td>
+                <td th:text="${cliente.correoElectronico}"></td>
+                <td class="acciones">
+                    <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn-editar">Editar</a>
+                    <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}" class="btn-eliminar">Eliminar</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(clientes)}" class="empty-row">
+                <td colspan="6" class="empty">No hay clientes registrados aún.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 </body>
 </html>
