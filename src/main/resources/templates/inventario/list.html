@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Inventario - FerreCloud</title>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/list.css}">
+        <style>
+            .alerta-stock {
+                background-color: #fef2f2;
+                border-left: 4px solid #ef4444;
+                color: #991b1b;
+                padding: 12px 16px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .stock-peligro {
+                color: #ef4444;
+                font-weight: 600;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Inventario</h1>
+                <p>Gestión de productos y control de stock</p>
+            </div>
+            <a th:href="@{/inventario/nuevo}" class="btn-nuevo">+ Nuevo Producto</a>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(alertas)}" class="alerta-stock">
+            <span>⚠️</span>
+            <div>
+                <strong>¡Atención!</strong> Tienes <span th:text="${#lists.size(alertas)}"></span> producto(s) con el stock igual o por debajo del mínimo permitido. Verifica la tabla.
+            </div>
+        </div>
+
+        <div class="buscador-wrapper">
+            <input type="text" id="buscador" placeholder="Buscar producto por nombre, categoría, proveedor...">
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock Actual</th>
+                    <th>Proveedor</th>
+                    <th>Stock Mín.</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${productos}">
+                    <td th:text="${producto.nombre}"></td>
+                    <td th:text="${producto.categoria}"></td>
+                    <td th:text="'$ ' + ${producto.precio}"></td>
+
+                    <td th:classappend="${producto.stock <= producto.stockMinimo} ? 'stock-peligro' : ''">
+                        <span th:text="${producto.stock}"></span>
+                        <span th:if="${producto.stock <= producto.stockMinimo}" title="Requiere reabastecimiento">⚠️</span>
+                    </td>
+
+                    <td th:text="${producto.proveedor}"></td>
+                    <td th:text="${producto.stockMinimo}"></td>
+                    <td class="acciones">
+                        <a th:href="@{/inventario/editar/{id}(id=${producto.id})}" class="btn-editar">Editar</a>
+                        <a th:href="@{/inventario/eliminar/{id}(id=${producto.id})}" class="btn-eliminar" onclick="return confirm('¿Estás seguro de eliminar este producto?');">Eliminar</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(productos)}" class="empty-row">
+                    <td colspan="7" class="empty">No hay productos registrados en el inventario aún.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/list.js}" defer></script>
+</th:block>
+
+</body>
+</html>
