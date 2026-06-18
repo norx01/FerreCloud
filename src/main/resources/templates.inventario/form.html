@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Inventario - FerreCloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <script th:src="@{/js/form.js}" defer></script>
+</head>
+<body>
+<div class="card">
+    <div class="card-header">
+        <div class="eyebrow">FerreCloud</div>
+        <h1>Gestión de Producto</h1>
+        <p>Completa los datos para registrar o actualizar el producto en el inventario.</p>
+    </div>
+    <div class="divider"></div>
+
+    <form th:action="@{/inventario/guardar}" th:object="${producto}" method="post">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="field-row">
+            <div class="field">
+                <label>Nombre del Producto</label>
+                <input type="text" th:field="*{nombre}" placeholder="Ej: Martillo Truper" required>
+            </div>
+            <div class="field">
+                <label>Categoría</label>
+                <input type="text" th:field="*{categoria}" placeholder="Ej: Herramientas Manuales" required>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label>Precio Unitario ($)</label>
+                <input type="number" step="0.01" th:field="*{precio}" placeholder="0.00" required>
+            </div>
+            <div class="field">
+                <label>Stock Actual</label>
+                <input type="number" th:field="*{stock}" placeholder="0" required>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label>Proveedor</label>
+                <input type="text" th:field="*{proveedor}" placeholder="Nombre de la empresa distribuidora" required>
+            </div>
+            <div class="field">
+                <label>Stock Mínimo (Alerta)</label>
+                <input type="number" th:field="*{stockMinimo}" placeholder="0" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Guardar Producto</button>
+    </form>
+
+    <a href="/inventario" class="back-link">← Volver al inventario</a>
+</div>
+</body>
+</html>
