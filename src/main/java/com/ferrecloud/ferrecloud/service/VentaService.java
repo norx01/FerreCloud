@@ -1,7 +1,7 @@
 package com.ferrecloud.ferrecloud.service;
 
-import com.ferrecloud.ferrecloud.dto.ItemOrdenDTO;
 import com.ferrecloud.ferrecloud.dto.VentaDTO;
+import com.ferrecloud.ferrecloud.model.Clientes;
 import com.ferrecloud.ferrecloud.model.ItemOrden;
 import com.ferrecloud.ferrecloud.model.Venta;
 import com.ferrecloud.ferrecloud.model.producto;
@@ -34,39 +34,58 @@ public class VentaService {
         return ventaRepository.findAll();
     }
 
+    public Venta buscarPorId(String id) {
+        return ventaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada: " + id));
+    }
+
     public Venta registrar(VentaDTO dto) {
-        // 1. Verificar stock y descontarlo
+        // 1. Verificar que el cliente existe y traer su nombre
+        Clientes cliente = clientesRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado: " + dto.getClienteId()));
+
+        // 2. Verificar stock, descontarlo y armar items
         List<ItemOrden> items = dto.getProductos().stream().map(d -> {
             producto prod = inventarioRepository.findById(d.getProductoId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + d.getProductoId()));
 
             if (prod.getStock() < d.getCantidad()) {
-                throw new RuntimeException("Stock insuficiente para: " + prod.getNombre());
+                throw new RuntimeException("Stock insuficiente para: " + prod.getNombre()
+                        + " (disponible: " + prod.getStock() + ")");
             }
 
             // Descontar stock
             prod.setStock(prod.getStock() - d.getCantidad());
             inventarioRepository.save(prod);
 
-            BigDecimal subtotal = d.getPrecioUnitario()
-                    .multiply(BigDecimal.valueOf(d.getCantidad()));
+            // Precio siempre viene de la BD, no del cliente
+            BigDecimal precioUnitario = BigDecimal.valueOf(prod.getPrecio());
+            BigDecimal subtotal = precioUnitario.multiply(BigDecimal.valueOf(d.getCantidad()));
+
             return new ItemOrden(prod.getId(), prod.getNombre(),
-                    d.getCantidad(), d.getPrecioUnitario(), subtotal);
+                    d.getCantidad(), precioUnitario, subtotal);
         }).collect(Collectors.toList());
 
-        // 2. Calcular total
+        // 3. Calcular total
         BigDecimal total = items.stream()
                 .map(ItemOrden::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 3. Guardar venta
+        // 4. Construir y guardar la venta con todos los campos
         Venta venta = new Venta();
-        venta.setClienteId(dto.getClienteId());
+        venta.setClienteId(cliente.getId());
+        venta.setClienteNombre(cliente.getNombre());
         venta.setEmpleadoId(dto.getEmpleadoId());
+        venta.setEmpleadoNombre(dto.getEmpleadoId()); // placeholder hasta tener módulo Usuarios
         venta.setFecha(LocalDateTime.now());
         venta.setProductos(items);
         venta.setTotal(total);
+        venta.setEstado("Completa");
 
         return ventaRepository.save(venta);
+    }
+
+    public void eliminar(String id) {
+        ventaRepository.deleteById(id);
     }
 }

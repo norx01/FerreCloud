@@ -23,8 +23,18 @@ public class VentaController {
         return ventaService.listar();
     }
 
+    @GetMapping("/{id}")
+    public Venta buscar(@PathVariable String id) {
+        return ventaService.buscarPorId(id);
+    }
+
     @PostMapping
-    public Venta registrar(@RequestBody VentaDTO dto) {
-        return ventaService.registrar(dto); //
+    public ResponseEntity<Venta> registrar(@RequestBody VentaDTO dto) {
+        return ResponseEntity.ok(ventaService.registrar(dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable String id) {
+        ventaService.eliminar(id);
     }
 }
