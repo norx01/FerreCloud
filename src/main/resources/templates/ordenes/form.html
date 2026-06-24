@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Nueva Orden - FerreCloud</title>
+    <th:block layout:fragment="estilos">
+        <script src="https://cdn.tailwindcss.com"></script>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+    <div class="max-w-2xl mx-auto">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Nueva Orden</h1>
+            <p class="text-sm text-gray-500 mt-1">Completa los datos para registrar la orden de compra.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Cliente</label>
+                <select id="clienteId"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <option value="">Selecciona un cliente...</option>
+                    <option th:each="c : ${clientes}"
+                            th:value="${c.id}"
+                            th:text="${c.nombre} + ' – ' + ${c.documento}">
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">ID Vendedor</label>
+                <input type="text" id="vendedorId" placeholder="Ej: EMP001"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400">
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Productos</label>
+                    <button type="button" onclick="agregarFila()"
+                            class="text-xs font-semibold text-orange-500 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-3 py-1.5 rounded-md transition-colors">
+                        + Agregar producto
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 mb-2 px-1">
+                    <span class="col-span-5 text-xs text-gray-400 font-medium">Producto</span>
+                    <span class="col-span-3 text-xs text-gray-400 font-medium">Cant.</span>
+                    <span class="col-span-3 text-xs text-gray-400 font-medium">Precio unit.</span>
+                    <span class="col-span-1"></span>
+                </div>
+
+                <div id="productos" class="space-y-2"></div>
+
+                <div class="mt-4 flex justify-end">
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl px-5 py-3 text-right">
+                        <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Total estimado</p>
+                        <p id="totalDisplay" class="text-2xl font-bold text-gray-900 mt-0.5">$0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mensajeError"
+                 class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3"></div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="guardarOrden()"
+                        class="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors">
+                    Guardar Orden
+                </button>
+                <a href="/ordenes"
+                   class="flex-1 text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        const PRODUCTOS_BD = /*[[${productos}]]*/ [];
+    </script>
+    <script>
+        function buildOptions() {
+            return PRODUCTOS_BD.map(p =>
+                `<option value="${p.id}" data-precio="${p.precio}" data-nombre="${p.nombre}">
+                    ${p.nombre} — $${Number(p.precio).toLocaleString('es-CO')}
+                 </option>`
+            ).join('');
+        }
+
+        function agregarFila() {
+            const cont = document.getElementById('productos');
+            const fila = document.createElement('div');
+            fila.className = 'grid grid-cols-12 gap-2 items-center producto-fila';
+            fila.innerHTML = `
+                <select class="col-span-5 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 select-producto">
+                    <option value="">Selecciona...</option>
+                    ${buildOptions()}
+                </select>
+                <input type="number" placeholder="1" min="1" value="1"
+                       class="col-span-3 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 cantidad">
+                <input type="number" readonly
+                       class="col-span-3 border border-gray-300 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500 precio">
+                <button type="button" onclick="eliminarFila(this)"
+                        class="col-span-1 text-red-400 hover:text-red-600 text-lg font-bold leading-none">×</button>
+            `;
+            fila.querySelector('.select-producto').addEventListener('change', function() {
+                const opt = this.selectedOptions[0];
+                fila.querySelector('.precio').value = opt.dataset.precio || '';
+                recalcularTotal();
+            });
+            fila.querySelector('.cantidad').addEventListener('input', recalcularTotal);
+            cont.appendChild(fila);
+        }
+
+        function eliminarFila(btn) {
+            btn.closest('.producto-fila').remove();
+            recalcularTotal();
+        }
+
+        function recalcularTotal() {
+            let total = 0;
+            document.querySelectorAll('.producto-fila').forEach(fila => {
+                const cant   = parseFloat(fila.querySelector('.cantidad').value) || 0;
+                const precio = parseFloat(fila.querySelector('.precio').value)   || 0;
+                total += cant * precio;
+            });
+            document.getElementById('totalDisplay').textContent =
+                '$' + total.toLocaleString('es-CO', { minimumFractionDigits: 0 });
+        }
+
+        async function guardarOrden() {
+            const clienteId  = document.getElementById('clienteId').value.trim();
+            const vendedorId = document.getElementById('vendedorId').value.trim();
+            const filas = document.querySelectorAll('.producto-fila');
+
+            if (!clienteId)         return mostrarError('Selecciona un cliente.');
+            if (!vendedorId)        return mostrarError('Ingresa el ID del vendedor.');
+            if (filas.length === 0) return mostrarError('Agrega al menos un producto.');
+
+            const productos = [];
+            for (const fila of filas) {
+                const select = fila.querySelector('.select-producto');
+                const cant   = parseInt(fila.querySelector('.cantidad').value);
+                const precio = parseFloat(fila.querySelector('.precio').value);
+                const nombre = select.selectedOptions[0]?.dataset.nombre || '';
+                const prodId = select.value;
+                if (!prodId || !cant || !precio)
+                    return mostrarError('Selecciona un producto y cantidad válidos en cada fila.');
+                productos.push({ productoId: prodId, nombreProducto: nombre, cantidad: cant, precioUnitario: precio });
+            }
+
+            try {
+                const resp = await fetch('/api/ordenes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clienteId, vendedorId, productos })
+                });
+                if (resp.ok) {
+                    window.location.href = '/ordenes';
+                } else {
+                    mostrarError('Error al guardar: ' + resp.status);
+                }
+            } catch (e) {
+                mostrarError('No se pudo conectar con el servidor.');
+            }
+        }
+
+        function mostrarError(msg) {
+            const div = document.getElementById('mensajeError');
+            div.textContent = msg;
+            div.classList.remove('hidden');
+            setTimeout(() => div.classList.add('hidden'), 4000);
+        }
+
+        agregarFila();
+    </script>
+</th:block>
+
+</body>
+</html>

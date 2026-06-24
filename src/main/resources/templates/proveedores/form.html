@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+    <div class="card">
+        <div class="card-header">
+            <div class="eyebrow">FerreCloud</div>
+            <h1>Gestión de Proveedor</h1>
+            <p>Completa los datos para registrar o editar el proveedor.</p>
+        </div>
+        <div class="divider"></div>
+
+        <form th:action="@{/proveedores/guardar}" th:object="${proveedor}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Nombre del Proveedor</label>
+                    <input type="text" th:field="*{nombre}" placeholder="Ej. Distribuidora Nacional">
+                </div>
+                <div class="field">
+                    <label>Teléfono</label>
+                    <input type="text" th:field="*{telefono}" placeholder="300 000 0000">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Dirección</label>
+                <input type="text" th:field="*{direccion}" placeholder="Ej. Carrera 40 # 10-20">
+            </div>
+
+            <div class="field">
+                <label>Productos Suministrados</label>
+                <input type="text" th:field="*{productosSuministrados}" placeholder="Ej. Herramientas, Cemento, Tubería">
+            </div>
+
+            <button type="submit" class="btn-submit">Guardar Proveedor</button>
+        </form>
+
+        <a href="/proveedores" class="back-link">← Volver al listado</a>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/form.js}" defer></script>
+</th:block>
+
+</body>
+</html>

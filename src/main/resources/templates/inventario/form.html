@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Inventario - FerreCloud</title>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+    <div class="card">
+        <div class="card-header">
+            <h1>Gestión de Producto</h1>
+            <p>Completa los datos para registrar o actualizar el producto en el inventario.</p>
+        </div>
+        <div class="divider"></div>
+
+        <form th:action="@{/inventario/guardar}" th:object="${producto}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Nombre del Producto</label>
+                    <input type="text" th:field="*{nombre}" placeholder="Ej: Martillo Truper" required>
+                </div>
+
+                <div class="field">
+                    <label>Categoría</label>
+                    <select id="categoriaSelect" onchange="manejarCategoria()">
+                        <option value="Herramientas Manuales">Herramientas Manuales</option>
+                        <option value="Herramientas Eléctricas">Herramientas Eléctricas</option>
+                        <option value="Materiales de Construcción">Materiales de Construcción</option>
+                        <option value="Pinturas y Accesorios">Pinturas y Accesorios</option>
+                        <option value="Plomería">Plomería</option>
+                        <option value="Electricidad">Electricidad</option>
+                        <option value="Tornillería">Tornillería</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Otro">Otro (Escribir nueva)...</option>
+                    </select>
+                    <input type="text" th:field="*{categoria}" placeholder="Escribe la categoría" style="display: none; margin-top: 0.5rem;">
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Precio Unitario ($)</label>
+                    <input type="number" step="0.01" th:field="*{precio}" placeholder="0.00" required>
+                </div>
+                <div class="field">
+                    <label>Stock Actual</label>
+                    <input type="number" th:field="*{stock}" placeholder="0" required>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Proveedor</label>
+                    <select th:field="*{proveedor}" required>
+                        <option value="" disabled selected>Seleccione un proveedor...</option>
+                        <option th:each="prov : ${proveedores}"
+                                th:value="${prov.nombre}"
+                                th:text="${prov.nombre}"></option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Stock Mínimo (Alerta)</label>
+                    <input type="number" th:field="*{stockMinimo}" placeholder="0" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Guardar Producto</button>
+        </form>
+
+        <a th:href="@{/inventario}" class="back-link">← Volver al inventario</a>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/form.js}" defer></script>
+
+    <script>
+        function manejarCategoria() {
+            const select = document.getElementById('categoriaSelect');
+            const inputReal = document.getElementById('categoria');
+
+            if (select.value === 'Otro') {
+                inputReal.style.display = 'block';
+                inputReal.value = '';
+                inputReal.focus();
+                inputReal.required = true;
+            } else {
+                inputReal.style.display = 'none';
+                inputReal.value = select.value;
+                inputReal.required = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const select = document.getElementById('categoriaSelect');
+            const inputReal = document.getElementById('categoria');
+
+            if (inputReal.value) {
+                let existeEnLista = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === inputReal.value) {
+                        existeEnLista = true;
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                if (!existeEnLista) {
+                    select.value = 'Otro';
+                    inputReal.style.display = 'block';
+                }
+            } else {
+                inputReal.value = select.value;
+            }
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

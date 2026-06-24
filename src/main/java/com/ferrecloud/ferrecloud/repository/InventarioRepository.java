@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface InventarioRepository extends MongoRepository<producto, String> {
 
-
+//stock minimo para mongo db, no tocar tambien gracias :)
     @Query("{ $expr: { $lte: [ '$stock', '$stockMinimo' ] } }")
     List<producto> findByStockBajo();
 

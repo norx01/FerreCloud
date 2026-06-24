@@ -19,14 +19,12 @@ public class ProveedoresView {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("proveedores", service.listar());
-        // Apunta a la plantilla HTML donde mostrarás la tabla
         return "proveedores/list";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("proveedor", new Proveedores());
-        // Apunta a la plantilla HTML del formulario
         return "proveedores/form";
     }
 
@@ -37,19 +35,18 @@ public class ProveedoresView {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable String id, Model model) {
+    public String editar(@PathVariable Integer id, Model model) {
         model.addAttribute("proveedor", service.buscarPorId(id));
         return "proveedores/form";
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable String id) {
+    public String eliminar(@PathVariable Integer id) {
         try {
             service.eliminar(id);
         } catch (IllegalStateException e) {
             return "redirect:/proveedores?error=restriccion";
         }
-
         return "redirect:/proveedores";
     }
 }

@@ -1,7 +1,7 @@
 package com.ferrecloud.ferrecloud.controller;
 
 import com.ferrecloud.ferrecloud.dto.OrdenCompraDTO;
-import com.ferrecloud.ferrecloud.model.EstadoOrden;
+import com.ferrecloud.ferrecloud.enums.EstadoOrden;
 import com.ferrecloud.ferrecloud.model.OrdenCompra;
 import com.ferrecloud.ferrecloud.service.OrdenCompraService;
 import jakarta.validation.Valid;
