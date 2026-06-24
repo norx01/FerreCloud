@@ -148,4 +148,22 @@ body {
     60%  { transform: translateX(-5px); }
     80%  { transform: translateX(5px); }
     100% { transform: translateX(0); }
+/* pega esto al final de estilos.css */
+.field select {
+    width: 100%;
+    background: #f9fafb;
+    border: 1px solid #dde1e7;
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    color: #1a1d27;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field select:focus {
+    border-color: #e85d04;
+    box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.12);
+}
 }

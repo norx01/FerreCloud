@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/list.css}">
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">FerreCloud</div>
+            <h1>Empleados</h1>
+            <p>Gestión de empleados registrados</p>
+        </div>
+        <a th:href="@{/usuarios/nuevo}" class="btn-nuevo">+ Nuevo Empleado</a>
+    </div>
+
+    <div class="buscador-wrapper">
+        <input type="text" id="buscador" placeholder="Buscar empleado por nombre, documento, cargo...">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Documento</th>
+                <th>Teléfono</th>
+                <th>Cargo</th>
+                <th>Salario</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="usuario : ${usuarios}">
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.documento}"></td>
+                <td th:text="${usuario.telefono}"></td>
+                <td th:text="${usuario.cargo}"></td>
+                <td th:text="${#numbers.formatDecimal(usuario.salario, 0, 'POINT', 0, 'NONE')}"></td>
+                <td th:text="${usuario.rol}"></td>
+                <td class="acciones">
+                    <a th:href="@{/usuarios/editar/{id}(id=${usuario.id})}" class="btn-editar">Editar</a>
+                    <a th:href="@{/usuarios/eliminar/{id}(id=${usuario.id})}" class="btn-eliminar">Eliminar</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(usuarios)}" class="empty-row">
+                <td colspan="7" class="empty">No hay empleados registrados aún.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/list.js}" defer></script>
+</th:block>
+
+</body>
+</html>

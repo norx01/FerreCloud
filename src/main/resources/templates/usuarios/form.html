@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <th:block layout:fragment="estilos">
+        <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+    <div class="card">
+        <div class="card-header">
+            <div class="eyebrow">FerreCloud</div>
+            <h1>Nuevo Empleado</h1>
+            <p>Completa los datos para registrar el empleado.</p>
+        </div>
+        <div class="divider"></div>
+
+        <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Nombre</label>
+                    <input type="text" th:field="*{nombre}" placeholder="Juan García">
+                </div>
+                <div class="field">
+                    <label>Documento</label>
+                    <input type="text" th:field="*{documento}" placeholder="1234567890">
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Teléfono</label>
+                    <input type="text" th:field="*{telefono}" placeholder="300 000 0000">
+                </div>
+                <div class="field">
+                    <label>Correo Electrónico</label>
+                    <input type="email" th:field="*{correoElectronico}" placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Dirección</label>
+                <input type="text" th:field="*{direccion}" placeholder="Calle 10 # 5-30, Cali">
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Cargo</label>
+                    <input type="text" th:field="*{cargo}" placeholder="Vendedor">
+                </div>
+                <div class="field">
+                    <label>Salario</label>
+                    <input type="number" th:field="*{salario}" placeholder="1500000" step="0.01">
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Rol</label>
+                    <select th:field="*{rol}">
+                        <option value="">Selecciona un rol</option>
+                        <option value="EMPLEADO">Empleado</option>
+                        <option value="ADMINISTRADOR">Administrador</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <input type="password" th:field="*{password}" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Guardar Empleado</button>
+        </form>
+
+        <a href="/usuarios" class="back-link">← Volver al listado</a>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/form.js}" defer></script>
+</th:block>
+
+</body>
+</html>
