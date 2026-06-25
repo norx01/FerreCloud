@@ -6,6 +6,8 @@ import com.ferrecloud.ferrecloud.service.VentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.ferrecloud.ferrecloud.enums.EstadoOrden;
+import com.ferrecloud.ferrecloud.service.OrdenCompraService;
 
 @Controller
 @RequestMapping("/ventas")
@@ -14,13 +16,17 @@ public class VentaView {
     private final VentaService ventaService;
     private final ClientesService clientesService;
     private final InventarioService inventarioService;
+    private final OrdenCompraService ordenService;
+
 
     public VentaView(VentaService ventaService,
                      ClientesService clientesService,
-                     InventarioService inventarioService) {
+                     InventarioService inventarioService,
+                     OrdenCompraService ordenService) {
         this.ventaService = ventaService;
         this.clientesService = clientesService;
         this.inventarioService = inventarioService;
+        this.ordenService = ordenService;
     }
 
     @GetMapping
@@ -34,6 +40,13 @@ public class VentaView {
         model.addAttribute("clientes", clientesService.listar());
         model.addAttribute("productos", inventarioService.listar());
         return "ventas/form";
+    }
+
+    @GetMapping("/completar-orden")
+    public String completarOrden(Model model) {
+        model.addAttribute("ordenesPendientes",
+                ordenService.listarPorEstado(EstadoOrden.PENDIENTE));
+        return "ventas/completar-orden";
     }
 
     @GetMapping("/eliminar/{id}")

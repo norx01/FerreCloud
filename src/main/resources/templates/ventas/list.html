@@ -17,11 +17,11 @@
 <div layout:fragment="contenido">
     <div class="max-w-6xl mx-auto">
 
-        <div class="flex items-end justify-between mb-8">
-            <div>
-                <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Ventas</h1>
-                <p class="text-sm text-gray-500 mt-1">Registro de ventas realizadas en la ferretería</p>
-            </div>
+        <div class="flex gap-3">
+            <a th:href="@{/ventas/completar-orden}"
+               class="border border-orange-500 text-orange-500 hover:bg-orange-50 text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                Completar Orden
+            </a>
             <a th:href="@{/ventas/nuevo}"
                class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
                 + Nueva Venta

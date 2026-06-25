@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Completar Orden - FerreCloud</title>
+    <th:block layout:fragment="estilos">
+        <script src="https://cdn.tailwindcss.com"></script>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="contenido">
+    <div class="max-w-5xl mx-auto">
+
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Completar Orden</h1>
+                <p class="text-sm text-gray-500 mt-1">Selecciona una orden pendiente para convertirla en venta</p>
+            </div>
+            <a href="/ventas"
+               class="border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-lg transition-colors">
+                ← Volver a Ventas
+            </a>
+        </div>
+
+        <!-- Mensaje de éxito o error -->
+        <div id="mensaje" class="hidden mb-4 text-sm px-4 py-3 rounded-lg border"></div>
+
+        <!-- Tabla de órdenes pendientes -->
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Cliente</th>
+                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Vendedor</th>
+                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha</th>
+                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Productos</th>
+                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
+                    <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Acción</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100" id="tablaBody">
+                <tr th:each="orden : ${ordenesPendientes}" th:id="'fila-' + ${orden.id}"
+                    class="hover:bg-orange-50 transition-colors">
+                    <td class="px-5 py-4 font-medium text-gray-800" th:text="${orden.clienteNombre}"></td>
+                    <td class="px-5 py-4 text-gray-600" th:text="${orden.vendedorId}"></td>
+                    <td class="px-5 py-4 text-gray-500 text-xs"
+                        th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td class="px-5 py-4 text-gray-600"
+                        th:text="${#lists.size(orden.productos)} + ' ítem(s)'"></td>
+                    <td class="px-5 py-4 font-semibold text-gray-800"
+                        th:text="'$' + ${#numbers.formatDecimal(orden.total, 1, 'COMMA', 0, 'POINT')}"></td>
+                    <td class="px-5 py-4">
+                        <button th:onclick="'convertir(\'' + ${orden.id} + '\')'"
+                                class="text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 px-3 py-1.5 rounded-md transition-colors">
+                            Convertir en Venta
+                        </button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(ordenesPendientes)}" id="filaVacia">
+                    <td colspan="6" class="text-center text-gray-400 py-12 text-sm">
+                        ✅ No hay órdenes pendientes por completar.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        async function convertir(ordenId) {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Procesando...';
+
+            try {
+                const resp = await fetch(`/api/ventas/desde-orden/${ordenId}`, {
+                    method: 'POST'
+                });
+
+                if (resp.ok) {
+                    // Quitar la fila de la tabla
+                    document.getElementById('fila-' + ordenId).remove();
+
+                    // Si no quedan filas, mostrar mensaje vacío
+                    if (document.querySelectorAll('#tablaBody tr:not(#filaVacia)').length === 0) {
+                        const filaVacia = document.getElementById('filaVacia');
+                        if (filaVacia) filaVacia.style.display = '';
+                        else {
+                            document.getElementById('tablaBody').innerHTML =
+                                `<tr><td colspan="6" class="text-center text-gray-400 py-12 text-sm">✅ No hay órdenes pendientes por completar.</td></tr>`;
+                        }
+                    }
+
+                    mostrarMensaje('✅ Orden convertida en venta exitosamente. Stock actualizado.', 'exito');
+                } else {
+                    const error = await resp.text();
+                    mostrarMensaje('❌ ' + error, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Convertir en Venta';
+                }
+            } catch (e) {
+                mostrarMensaje('❌ No se pudo conectar con el servidor.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Convertir en Venta';
+            }
+        }
+
+        function mostrarMensaje(texto, tipo) {
+            const div = document.getElementById('mensaje');
+            div.textContent = texto;
+            div.className = tipo === 'exito'
+                ? 'mb-4 text-sm px-4 py-3 rounded-lg border bg-green-50 text-green-700 border-green-200'
+                : 'mb-4 text-sm px-4 py-3 rounded-lg border bg-red-50 text-red-700 border-red-200';
+            div.classList.remove('hidden');
+            if (tipo === 'exito') {
+                setTimeout(() => div.classList.add('hidden'), 4000);
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

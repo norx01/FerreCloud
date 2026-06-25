@@ -93,4 +93,8 @@ public class OrdenCompraService {
                 .map(ItemOrden::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public List<OrdenCompra> listarPorEstado(EstadoOrden estado) {
+        return repository.findByEstado(estado);
+    }
 }

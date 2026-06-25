@@ -28,9 +28,14 @@ public class VentaController {
         return ventaService.buscarPorId(id);
     }
 
-    @PostMapping
-    public ResponseEntity<Venta> registrar(@RequestBody VentaDTO dto) {
-        return ResponseEntity.ok(ventaService.registrar(dto));
+    @PostMapping("/desde-orden/{ordenId}")
+    public ResponseEntity<?> registrarDesdeOrden(@PathVariable String ordenId) {
+        try {
+            Venta venta = ventaService.registrarDesdeOrden(ordenId);
+            return ResponseEntity.ok(venta);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

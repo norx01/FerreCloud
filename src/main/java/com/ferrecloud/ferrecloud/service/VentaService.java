@@ -15,19 +15,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ferrecloud.ferrecloud.enums.EstadoOrden;
+import com.ferrecloud.ferrecloud.model.OrdenCompra;
+import com.ferrecloud.ferrecloud.repository.OrdenCompraRepository;
+
 @Service
 public class VentaService {
 
     private final VentaRepository ventaRepository;
     private final InventarioRepository inventarioRepository;
     private final ClientesRepository clientesRepository;
+    private final OrdenCompraRepository ordenRepository;
 
     public VentaService(VentaRepository ventaRepository,
                         InventarioRepository inventarioRepository,
-                        ClientesRepository clientesRepository) {
+                        ClientesRepository clientesRepository,
+                        OrdenCompraRepository ordenRepository) {
         this.ventaRepository = ventaRepository;
         this.inventarioRepository = inventarioRepository;
         this.clientesRepository = clientesRepository;
+        this.ordenRepository = ordenRepository;
     }
 
     public List<Venta> listar() {
@@ -39,48 +46,45 @@ public class VentaService {
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada: " + id));
     }
 
-    public Venta registrar(VentaDTO dto) {
-        // 1. Verificar que el cliente existe y traer su nombre
-        Clientes cliente = clientesRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado: " + dto.getClienteId()));
+    public Venta registrarDesdeOrden(String ordenId) {
+        // 1. Buscar la orden
+        OrdenCompra orden = ordenRepository.findById(ordenId)
+                .orElseThrow(() -> new RuntimeException("Orden no encontrada: " + ordenId));
 
-        // 2. Verificar stock, descontarlo y armar items
-        List<ItemOrden> items = dto.getProductos().stream().map(d -> {
-            producto prod = inventarioRepository.findById(d.getProductoId())
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + d.getProductoId()));
+        if (orden.getEstado() != EstadoOrden.PENDIENTE) {
+            throw new RuntimeException("La orden ya fue procesada.");
+        }
 
-            if (prod.getStock() < d.getCantidad()) {
+        // 2. Verificar y descontar stock de cada producto
+        List<ItemOrden> itemsActualizados = orden.getProductos().stream().map(item -> {
+            producto prod = inventarioRepository.findById(item.getProductoId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + item.getProductoId()));
+
+            if (prod.getStock() < item.getCantidad()) {
                 throw new RuntimeException("Stock insuficiente para: " + prod.getNombre()
                         + " (disponible: " + prod.getStock() + ")");
             }
 
-            // Descontar stock
-            prod.setStock(prod.getStock() - d.getCantidad());
+            prod.setStock(prod.getStock() - item.getCantidad());
             inventarioRepository.save(prod);
 
-            // Precio siempre viene de la BD, no del cliente
-            BigDecimal precioUnitario = BigDecimal.valueOf(prod.getPrecio());
-            BigDecimal subtotal = precioUnitario.multiply(BigDecimal.valueOf(d.getCantidad()));
-
-            return new ItemOrden(prod.getId(), prod.getNombre(),
-                    d.getCantidad(), precioUnitario, subtotal);
+            return item; // el item ya tiene nombre, precio y subtotal desde la orden
         }).collect(Collectors.toList());
 
-        // 3. Calcular total
-        BigDecimal total = items.stream()
-                .map(ItemOrden::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // 4. Construir y guardar la venta con todos los campos
+        // 3. Crear la venta a partir de la orden
         Venta venta = new Venta();
-        venta.setClienteId(cliente.getId());
-        venta.setClienteNombre(cliente.getNombre());
-        venta.setEmpleadoId(dto.getEmpleadoId());
-        venta.setEmpleadoNombre(dto.getEmpleadoId()); // placeholder hasta tener módulo Usuarios
+        venta.setClienteId(orden.getClienteId());
+        venta.setClienteNombre(orden.getClienteNombre());
+        venta.setEmpleadoId(orden.getVendedorId());
+        venta.setEmpleadoNombre(orden.getVendedorNombre());
         venta.setFecha(LocalDateTime.now());
-        venta.setProductos(items);
-        venta.setTotal(total);
+        venta.setProductos(itemsActualizados);
+        venta.setTotal(orden.getTotal());
         venta.setEstado("Completa");
+
+        // 4. Marcar la orden como PAGADA
+        orden.setEstado(EstadoOrden.PAGADA);
+        ordenRepository.save(orden);
 
         return ventaRepository.save(venta);
     }
